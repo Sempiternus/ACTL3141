@@ -3,6 +3,9 @@ library(data.table)
 library(dplyr)
 library(xlsx)
 library(fame)
+library(ggplot2)
+library(reshape)
+library(scales)
 
 data <- read.csv("DeathsEngland.csv")
 data$age <- as.numeric(as.character(data$age))
@@ -169,11 +172,17 @@ listf2018 <- as.data.frame(lapply(my.listf2018, function(w) {(sum((w$`Std Rate (
 femaleASMR <- mget(ls(pattern="^listf[0-9]+"))
 f_ASMR <- as.data.frame(lapply(femaleASMR, function(x) {rowMeans(x)}))
 
+fASMR <- as.data.frame(as.numeric(unlist(f_ASMR)))
+mASMR <- as.data.frame (as.numeric(unlist(m_ASMR)))
+years <- as.data.frame(c(2001:2018))
+ASMR <- cbind(years, mASMR, fASMR)
+colnames(ASMR) <- c('year', 'male', 'female')
+ASMR <- melt(ASMR, id="year")
+colnames(ASMR) <- c('Year', 'Gender', 'ASMR')
 
-
-
-
-
-
-
-
+ggplot(data=ASMR,
+       aes(x=Year, y=ASMR, colour=Gender)) +
+    geom_line() +
+    ggtitle("Age Standardised Mortality Rates for Male and Females") + 
+    scale_x_continuous(breaks=pretty_breaks(n=18)) + 
+    scale_y_continuous(breaks=pretty_breaks(n=15))
