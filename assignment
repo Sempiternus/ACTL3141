@@ -57,76 +57,117 @@ dsr(data=data %>% filter(IMD.Decile == j & sex == k & Registration.year == i),
 
 my.listm2001 <- mget(ls(pattern="^male2001[0-9]+"))
 listm2001 <- as.data.frame(lapply(my.listm2001, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2001)
 
 my.listm2002 <- mget(ls(pattern="^male2002[0-9]+"))
 listm2002 <- as.data.frame(lapply(my.listm2002, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2002)
 
 my.listm2003 <- mget(ls(pattern="^male2003[0-9]+"))
 listm2003 <- as.data.frame(lapply(my.listm2003, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2003)
 
 my.listm2004 <- mget(ls(pattern="^male2004[0-9]+"))
 listm2004 <- as.data.frame(lapply(my.listm2004, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2004)
 
 my.listm2005 <- mget(ls(pattern="^male2005[0-9]+"))
 listm2005 <- as.data.frame(lapply(my.listm2005, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2005)
 
 my.listm2006 <- mget(ls(pattern="^male2006[0-9]+"))
 listm2006 <- as.data.frame(lapply(my.listm2006, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2006)
 
 my.listm2007 <- mget(ls(pattern="^male2007[0-9]+"))
 listm2007 <- as.data.frame(lapply(my.listm2007, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2007)
 
 my.listm2008 <- mget(ls(pattern="^male2008[0-9]+"))
 listm2008 <- as.data.frame(lapply(my.listm2008, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2008)
 
 my.listm2009 <- mget(ls(pattern="^male2009[0-9]+"))
 listm2009 <- as.data.frame(lapply(my.listm2009, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2009)
 
 my.listm2010 <- mget(ls(pattern="^male2010[0-9]+"))
 listm2010 <- as.data.frame(lapply(my.listm2010, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2010)
 
 my.listm2011 <- mget(ls(pattern="^male2011[0-9]+"))
 listm2011 <- as.data.frame(lapply(my.listm2011, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2011)
 
 my.listm2012 <- mget(ls(pattern="^male2012[0-9]+"))
 listm2012 <- as.data.frame(lapply(my.listm2012, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2012)
 
 my.listm2013 <- mget(ls(pattern="^male2013[0-9]+"))
 listm2013 <- as.data.frame(lapply(my.listm2013, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2013)
 
 my.listm2014 <- mget(ls(pattern="^male2014[0-9]+"))
 listm2014 <- as.data.frame(lapply(my.listm2014, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2014)
 
 my.listm2015 <- mget(ls(pattern="^male2015[0-9]+"))
 listm2015 <- as.data.frame(lapply(my.listm2015, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2015)
 
 my.listm2016 <- mget(ls(pattern="^male2016[0-9]+"))
 listm2016 <- as.data.frame(lapply(my.listm2016, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2016)
 
 my.listm2017 <- mget(ls(pattern="^male2017[0-9]+"))
 listm2017 <- as.data.frame(lapply(my.listm2017, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2017)
 
 my.listm2018 <- mget(ls(pattern="^male2018[0-9]+"))
 listm2018 <- as.data.frame(lapply(my.listm2018, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
-rowMeans(listm2018)
 
+maleASMR <- mget(ls(pattern="^listm[0-9]+"))
+m_ASMR <- as.data.frame(lapply(maleASMR, function(x) {rowMeans(x)}))
+
+my.listf2001 <- mget(ls(pattern="^female2001[0-9]+"))
+listf2001 <- as.data.frame(lapply(my.listf2001, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2002 <- mget(ls(pattern="^female2002[0-9]+"))
+listf2002 <- as.data.frame(lapply(my.listf2002, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2003 <- mget(ls(pattern="^female2003[0-9]+"))
+listf2003 <- as.data.frame(lapply(my.listf2003, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2004 <- mget(ls(pattern="^female2004[0-9]+"))
+listf2004 <- as.data.frame(lapply(my.listf2004, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2005 <- mget(ls(pattern="^female2005[0-9]+"))
+listf2005 <- as.data.frame(lapply(my.listf2005, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2006 <- mget(ls(pattern="^female2006[0-9]+"))
+listf2006 <- as.data.frame(lapply(my.listf2006, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2007 <- mget(ls(pattern="^female2007[0-9]+"))
+listf2007 <- as.data.frame(lapply(my.listf2007, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2008 <- mget(ls(pattern="^female2008[0-9]+"))
+listf2008 <- as.data.frame(lapply(my.listf2008, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2009 <- mget(ls(pattern="^female2009[0-9]+"))
+listf2009 <- as.data.frame(lapply(my.listf2009, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2010 <- mget(ls(pattern="^female2010[0-9]+"))
+listf2010 <- as.data.frame(lapply(my.listf2010, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2011 <- mget(ls(pattern="^female2011[0-9]+"))
+listf2011 <- as.data.frame(lapply(my.listf2011, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2012 <- mget(ls(pattern="^female2012[0-9]+"))
+listf2012 <- as.data.frame(lapply(my.listf2012, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2013 <- mget(ls(pattern="^female2013[0-9]+"))
+listf2013 <- as.data.frame(lapply(my.listf2013, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2014 <- mget(ls(pattern="^female2014[0-9]+"))
+listf2014 <- as.data.frame(lapply(my.listf2014, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2015 <- mget(ls(pattern="^female2015[0-9]+"))
+listf2015 <- as.data.frame(lapply(my.listf2015, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2016 <- mget(ls(pattern="^female2016[0-9]+"))
+listf2016 <- as.data.frame(lapply(my.listf2016, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2017 <- mget(ls(pattern="^female2017[0-9]+"))
+listf2017 <- as.data.frame(lapply(my.listf2017, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+my.listf2018 <- mget(ls(pattern="^female2018[0-9]+"))
+listf2018 <- as.data.frame(lapply(my.listf2018, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+
+femaleASMR <- mget(ls(pattern="^listf[0-9]+"))
+f_ASMR <- as.data.frame(lapply(femaleASMR, function(x) {rowMeans(x)}))
 
 
 
