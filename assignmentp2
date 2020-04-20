@@ -1,0 +1,451 @@
+library(dsr)
+library(data.table)
+library(dplyr)
+library(xlsx)
+library(fame)
+library(ggplot2)
+library(reshape)
+library(scales)
+library('lifecontingencies')
+library("survival")
+
+data <- read.csv("DeathsEngland.csv") #Read the data
+data$age <- as.numeric(as.character(data$age)) 
+data$age[is.na(data$age)] <- 90 #Convert 90+ to 90 in order to manipulate in r
+data$age <- as.numeric(as.character(data$age))
+
+####FINDING THE ASMR############################################################################################################
+
+DASDR <- read.xlsx('DASDR.xls', "90+", rowIndex = 7:27, colIndex = 1:2) #Extract ESP values from provided excel files
+colnames(DASDR) <- c("Age.group","pop")
+
+#Group ages into different age groups using dplyr and mutate
+
+data <- data %>% mutate(Age.group = case_when( age < 1 ~ '<1', 
+age >= 1 & age <= 4 ~'1-4', 
+age >= 5 & age <= 9 ~ "5-9", 
+age >= 10 & age <= 14 ~ "10-14", 
+age >= 15 & age <= 19 ~ "15-19", 
+age >= 20 & age <= 24 ~ "20-24", 
+age >= 25 & age <= 29 ~ "25-29", 
+age >= 30 & age <= 34 ~ "30-34", 
+age >= 35 & age <= 39 ~ "35-39", 
+age >= 40 & age <= 44 ~ "40-44", 
+age >= 45 & age <= 49 ~ "45-49", 
+age >= 50 & age <= 54 ~ "50-54", 
+age >= 55 & age <= 59 ~ "55-59", 
+age >= 60 & age <= 64 ~ "60-64", 
+age >= 65 & age <= 69 ~ "65-69", 
+age >= 70 & age <= 74 ~ "70-74", 
+age >= 75 & age <= 79 ~ "75-79", 
+age >= 80 & age <= 84 ~ "80-84", 
+age >= 85 & age <= 89 ~ "85-89", 
+age >= 90 ~ "90+"))
+
+gender = c("male", "female") #Vector for our loops
+
+#Construct a loop that calculates ASMRs based on deciles, gender and year and inputs this information into a newly generated dataframe.
+
+for (i in 2001:2018) 
+{
+for (j in 1:10)
+{
+for (k in gender)
+{
+     assign(paste0(k, i, j),
+dsr(data=data %>% filter(IMD.Decile == j & sex == k & Registration.year == i),
+                  event=deaths,
+                  fu=population,
+                  subgroup=Age.group, sex,
+                  refdata=DASDR,
+                  method="gamma",
+                  sig=0.95,
+                  mp=100000,
+                  decimals=4))
+}
+}
+}
+
+#Group our newly formed dataframes into lists based on year & gender. These steps are copy + pasted over and over again due to difficulty of constructing a handle for large lists like these. 
+
+my.listm2001 <- mget(ls(pattern="^male2001[0-9]+"))
+listm2001 <- as.data.frame(lapply(my.listm2001, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2001) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2001) <- c(2001)
+
+my.listm2002 <- mget(ls(pattern="^male2002[0-9]+"))
+listm2002 <- as.data.frame(lapply(my.listm2002, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2002) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2002) <- c(2002)
+
+my.listm2003 <- mget(ls(pattern="^male2003[0-9]+"))
+listm2003 <- as.data.frame(lapply(my.listm2003, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2003) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2003) <- c(2003)
+
+my.listm2004 <- mget(ls(pattern="^male2004[0-9]+"))
+listm2004 <- as.data.frame(lapply(my.listm2004, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2004) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2004) <- c(2004)
+
+my.listm2005 <- mget(ls(pattern="^male2005[0-9]+"))
+listm2005 <- as.data.frame(lapply(my.listm2005, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2005) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2005) <- c(2005)
+
+my.listm2006 <- mget(ls(pattern="^male2006[0-9]+"))
+listm2006 <- as.data.frame(lapply(my.listm2006, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2006) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2006) <- c(2006)
+
+my.listm2007 <- mget(ls(pattern="^male2007[0-9]+"))
+listm2007 <- as.data.frame(lapply(my.listm2007, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2007) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2007) <- c(2007)
+
+my.listm2008 <- mget(ls(pattern="^male2008[0-9]+"))
+listm2008 <- as.data.frame(lapply(my.listm2008, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2008) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2008) <- c(2008)
+
+my.listm2009 <- mget(ls(pattern="^male2009[0-9]+"))
+listm2009 <- as.data.frame(lapply(my.listm2009, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2009) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2009) <- c(2009)
+
+my.listm2010 <- mget(ls(pattern="^male2010[0-9]+"))
+listm2010 <- as.data.frame(lapply(my.listm2010, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2010) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2010) <- c(2010)
+
+my.listm2011 <- mget(ls(pattern="^male2011[0-9]+"))
+listm2011 <- as.data.frame(lapply(my.listm2011, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2011) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2011) <- c(2011)
+
+my.listm2012 <- mget(ls(pattern="^male2012[0-9]+"))
+listm2012 <- as.data.frame(lapply(my.listm2012, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2012) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2012) <- c(2012)
+
+my.listm2013 <- mget(ls(pattern="^male2013[0-9]+"))
+listm2013 <- as.data.frame(lapply(my.listm2013, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2013) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2013) <- c(2013)
+
+my.listm2014 <- mget(ls(pattern="^male2014[0-9]+"))
+listm2014 <- as.data.frame(lapply(my.listm2014, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2014) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2014) <- c(2014)
+
+my.listm2015 <- mget(ls(pattern="^male2015[0-9]+"))
+listm2015 <- as.data.frame(lapply(my.listm2015, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2015) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2015) <- c(2015)
+
+my.listm2016 <- mget(ls(pattern="^male2016[0-9]+"))
+listm2016 <- as.data.frame(lapply(my.listm2016, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2016) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2016) <- c(2016)
+
+my.listm2017 <- mget(ls(pattern="^male2017[0-9]+"))
+listm2017 <- as.data.frame(lapply(my.listm2017, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2017) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2017) <- c(2017)
+
+my.listm2018 <- mget(ls(pattern="^male2018[0-9]+"))
+listm2018 <- as.data.frame(lapply(my.listm2018, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listm2018) <- c(paste0("IMD", seq(1:10)))
+rownames(listm2018) <- c(2018)
+
+#Group these lists into a larger list based on gender
+
+maleASMR <- mget(ls(pattern="^listm[0-9]+"))
+m_ASMR <- as.data.frame(lapply(maleASMR, function(x) {rowMeans(x)})) #Find the mean of each year to return an average ASMR across all 10 deciles
+
+#Repeat this process for females
+
+my.listf2001 <- mget(ls(pattern="^female2001[0-9]+"))
+listf2001 <- as.data.frame(lapply(my.listf2001, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2001) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2001) <- c(2001)
+
+my.listf2002 <- mget(ls(pattern="^female2002[0-9]+"))
+listf2002 <- as.data.frame(lapply(my.listf2002, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2002) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2002) <- c(2002)
+
+my.listf2003 <- mget(ls(pattern="^female2003[0-9]+"))
+listf2003 <- as.data.frame(lapply(my.listf2003, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2003) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2003) <- c(2003)
+
+my.listf2004 <- mget(ls(pattern="^female2004[0-9]+"))
+listf2004 <- as.data.frame(lapply(my.listf2004, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2004) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2004) <- c(2004)
+
+my.listf2005 <- mget(ls(pattern="^female2005[0-9]+"))
+listf2005 <- as.data.frame(lapply(my.listf2005, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2005) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2005) <- c(2005)
+
+my.listf2006 <- mget(ls(pattern="^female2006[0-9]+"))
+listf2006 <- as.data.frame(lapply(my.listf2006, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2006) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2006) <- c(2006)
+
+
+my.listf2007 <- mget(ls(pattern="^female2007[0-9]+"))
+listf2007 <- as.data.frame(lapply(my.listf2007, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2007) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2007) <- c(2007)
+
+my.listf2008 <- mget(ls(pattern="^female2008[0-9]+"))
+listf2008 <- as.data.frame(lapply(my.listf2008, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2008) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2008) <- c(2008)
+
+my.listf2009 <- mget(ls(pattern="^female2009[0-9]+"))
+listf2009 <- as.data.frame(lapply(my.listf2009, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2009) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2009) <- c(2009)
+
+my.listf2010 <- mget(ls(pattern="^female2010[0-9]+"))
+listf2010 <- as.data.frame(lapply(my.listf2010, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2010) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2010) <- c(2010)
+
+my.listf2011 <- mget(ls(pattern="^female2011[0-9]+"))
+listf2011 <- as.data.frame(lapply(my.listf2011, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2011) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2011) <- c(2011)
+
+my.listf2012 <- mget(ls(pattern="^female2012[0-9]+"))
+listf2012 <- as.data.frame(lapply(my.listf2012, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2012) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2012) <- c(2012)
+
+my.listf2013 <- mget(ls(pattern="^female2013[0-9]+"))
+listf2013 <- as.data.frame(lapply(my.listf2013, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2013) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2013) <- c(2013)
+
+my.listf2014 <- mget(ls(pattern="^female2014[0-9]+"))
+listf2014 <- as.data.frame(lapply(my.listf2014, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2014) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2014) <- c(2014)
+
+my.listf2015 <- mget(ls(pattern="^female2015[0-9]+"))
+listf2015 <- as.data.frame(lapply(my.listf2015, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2015) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2015) <- c(2015)
+
+my.listf2016 <- mget(ls(pattern="^female2016[0-9]+"))
+listf2016 <- as.data.frame(lapply(my.listf2016, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2016) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2016) <- c(2016)
+
+my.listf2017 <- mget(ls(pattern="^female2017[0-9]+"))
+listf2017 <- as.data.frame(lapply(my.listf2017, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2017) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2017) <- c(2017)
+
+my.listf2018 <- mget(ls(pattern="^female2018[0-9]+"))
+listf2018 <- as.data.frame(lapply(my.listf2018, function(w) {(sum((w$`Std Rate (per 1e+05)` * DASDR$pop)/100000))}))
+colnames(listf2018) <- c(paste0("IMD", seq(1:10)))
+rownames(listf2018) <- c(2018)
+
+femaleASMR <- mget(ls(pattern="^listf[0-9]+"))
+f_ASMR <- as.data.frame(lapply(femaleASMR, function(x) {rowMeans(x)}))
+
+#Fix our dataframes and add year column in order to plot it with ggplot later
+
+fASMR <- as.data.frame(as.numeric(unlist(f_ASMR)))
+mASMR <- as.data.frame (as.numeric(unlist(m_ASMR)))
+years <- as.data.frame(c(2001:2018))
+ASMR <- cbind(years, mASMR, fASMR) #Adding years and merging male/female dataframes
+colnames(ASMR) <- c('year', 'male', 'female') #rename columns
+ASMR <- melt(ASMR, id="year") #Melt the columns for purposes of ggplot
+colnames(ASMR) <- c('Year', 'Gender', 'ASMR')
+
+#Graph a mean ASMR for different genders across 2001-2018
+
+ggplot(data=ASMR,
+       aes(x=Year, y=ASMR, colour=Gender)) +
+    geom_line() +
+    ggtitle("Age Standardised Mortality Rates for Male and Females") + 
+    scale_x_continuous(breaks=pretty_breaks(n=18)) + 
+    scale_y_continuous(breaks=pretty_breaks(n=15))
+
+#Construct new dataframes that take all IMD values instead of their mean across 10 deciles
+f_ASMR <- rbind(listf2001, listf2002, listf2003, listf2004, listf2005, listf2006, listf2007, listf2008, listf2009, listf2010, listf2011, listf2012, listf2013, listf2014, listf2015, listf2016, listf2017, listf2018)
+
+m_ASMR <- rbind(listm2001, listm2002, listm2003, listm2004, listm2005, listm2006, listm2007, listm2008, listm2009, listm2010, listm2011, listm2012, listm2013, listm2014, listm2015, listm2016, listm2017, listm2018)
+
+#Shift the position of the second column as R automatically shifts IMD10 after IMD1. This was irrelavent earlier as we took a mean. 
+f_ASMR <- f_ASMR%>%select(-IMD2,everything())
+colnames(f_ASMR) <- c(paste0("IMD", seq(1:10)))
+
+m_ASMR <- m_ASMR%>%select(-IMD2,everything())
+colnames(m_ASMR) <- c(paste0("IMD", seq(1:10)))
+
+#Add a years column for graphing purposes
+fe_ASMR <- cbind(years, f_ASMR)
+colnames(fe_ASMR)[1] <- "Year" #Rename a column
+
+#Construct a plot with 10 different lines. Construct one for females and one for males)
+ggplot(fe_ASMR, aes(x=Year)) + 
+    geom_line(aes(y = IMD1, color = "red")) + 
+    geom_line(aes(y = IMD2, color="blue")) +
+    geom_line(aes(y = IMD3, color="orange")) +
+    geom_line(aes(y = IMD4, color="green"))+
+    geom_line(aes(y = IMD5, color="black")) +
+    geom_line(aes(y = IMD6, color="orchid")) +
+    geom_line(aes(y = IMD7, color="violet")) +
+    geom_line(aes(y = IMD8, color="slateblue")) +
+    geom_line(aes(y = IMD9, color="gray")) +
+    geom_line(aes(y = IMD10, color="cyan")) +
+    ggtitle("Age Standardised Mortality Rates for Females") +
+    scale_x_continuous(breaks=pretty_breaks(n=18)) + 
+    scale_y_continuous(breaks=pretty_breaks(n=10)) +     	
+    scale_color_identity(name = "Legend",
+                     breaks = c("red", "blue", "orange", "green", "black", "orchid", "violet", "slateblue", "gray", "cyan"),
+                     labels = c("IMD1", "IMD2", "IMD3", "IMD4", "IMD5", "IMD6", "IMD7", "IMD8", "IMD9", "IMD10"),
+                     guide = "legend")
+
+#Repeat this process
+ma_ASMR <- cbind(years, m_ASMR)
+colnames(ma_ASMR)[1] <- "Year" #Rename a column
+
+ggplot(ma_ASMR, aes(x=Year)) + 
+    geom_line(aes(y = IMD1, color = "red")) + 
+    geom_line(aes(y = IMD2, color="blue")) +
+    geom_line(aes(y = IMD3, color="orange")) +
+    geom_line(aes(y = IMD4, color="green"))+
+    geom_line(aes(y = IMD5, color="black")) +
+    geom_line(aes(y = IMD6, color="orchid")) +
+    geom_line(aes(y = IMD7, color="violet")) +
+    geom_line(aes(y = IMD8, color="slateblue")) +
+    geom_line(aes(y = IMD9, color="gray")) +
+    geom_line(aes(y = IMD10, color="cyan")) +
+    ggtitle("Age Standardised Mortality Rates for Males") +
+    scale_x_continuous(breaks=pretty_breaks(n=18)) + 
+    scale_y_continuous(breaks=pretty_breaks(n=10)) +     	
+    scale_color_identity(name = "Legend",
+                     breaks = c("red", "blue", "orange", "green", "black", "orchid", "violet", "slateblue", "gray", "cyan"),
+                     labels = c("IMD1", "IMD2", "IMD3", "IMD4", "IMD5", "IMD6", "IMD7", "IMD8", "IMD9", "IMD10"),
+                     guide = "legend")
+        
+###########LIFE EXPECTANCIES#############################################################################################################################################################
+
+#Construct an empty dataframe to fill our information into. 
+#Then, extract the deaths in England for each gender, decile and year from our dataset.
+
+m=NULL
+
+#Loop for data extraction
+for (i in 1:10)
+{
+for (k in 0:90)
+{
+    x <- mean(data$deaths[data$IMD.Decile == i & data$sex == 'male' & data$age == k]) #We use mean in order to find the average amount of deaths at say, age 10, as we attempt to calculate a constant mortality rate for each age, rather than changing it over years.
+    m[i] = rbind(m[i], data.frame(x))
+}
+}
+
+#Convert list into dataframe
+m <- do.call(rbind.data.frame, m)
+colnames(m) <- c(0:90) #Add column names for each age
+
+#Repeat process for females
+f = NULL
+for (i in 1:10)
+{
+for (k in 0:90)
+{
+    x <- mean(data$deaths[data$IMD.Decile == i & data$sex == 'female' & data$age == k]) 
+    f[i] = rbind(f[i], data.frame(x))
+}
+}
+f <- do.call(rbind.data.frame, f)
+colnames(f) <- c(0:90)
+
+#Repeat the process, except this time extract data for population specifically
+mp=NULL
+for (i in 1:10)
+{
+for (k in 0:90)
+{
+    x <- mean(data$population[data$IMD.Decile == i & data$sex == 'male' & data$age == k])
+    mp[i] = rbind(mp[i], data.frame(x))
+}
+}
+mp <- do.call(rbind.data.frame, mp)
+colnames(mp) <- c(0:90)
+
+
+fp = NULL
+for (i in 1:10)
+{
+for (k in 0:90)
+{
+    x <- mean(data$population[data$IMD.Decile == i & data$sex == 'female' & data$age == k])
+    fp[i] = rbind(fp[i], data.frame(x))
+}
+}
+fp <- do.call(rbind.data.frame, fp)
+colnames(fp) <- c(0:90)
+
+#Approximatate qx by dividing deaths by population 
+fqx <- cbind(f/fp)
+fqx <- (t(fqx)) #Transpose the information
+fqx <- as.data.frame(fqx)
+
+mqx <- cbind(m/mp)
+mqx <- t(mqx)
+mqx <- as.data.frame(mqx)
+
+#Construct a dataframe with all our information. Within our new dataframe construction, we include calculations for the life expectancy from birth.
+fEXN <- data.frame(IMD1 = numeric(), IMD2 = numeric(), IMD3 = numeric(), IMD4 = numeric(), IMD5 = numeric(), IMD6 = numeric(), IMD7 = numeric(), IMD8 = numeric(), IMD9 = numeric(), IMD10 = numeric())
+fEXN[nrow(fEXN)+1, ] <- c(exn(probs2lifetable(fqx$V1, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete"), 
+(exn(probs2lifetable(fqx$V2, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx$V3, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx$V4, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx$V5, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx$V6, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx$V7, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx$V8, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx$V9, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx$V10, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")))
+fEXN <- t(fEXN)
+
+#Repeat
+mEXN <- data.frame(IMD1 = numeric(), IMD2 = numeric(), IMD3 = numeric(), IMD4 = numeric(), IMD5 = numeric(), IMD6 = numeric(), IMD7 = numeric(), IMD8 = numeric(), IMD9 = numeric(), IMD10 = numeric())
+mEXN[nrow(mEXN)+1, ] <- c(exn(probs2lifetable(mqx$V1, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete"), 
+(exn(probs2lifetable(mqx$V2, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V3, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V4, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V5, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V6, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V7, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V8, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V9, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V10, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")))
+mEXN <- t(mEXN)
+
+#Construct a vector of deciles to merge with our life expectancy dataframes. 
+deciles <- as.data.frame(c(1:10))
+EXN <- cbind(deciles, mEXN, fEXN) #Combine all three together
+colnames(EXN) <- c("Decile", "Male", "Female")
+
+d <- melt(EXN, "Decile")
+
+#Create a graph that shows the change in life expectancy when compared across different deciles and gender. 
+ggplot(d, aes(x=Decile, y=value, color=variable)) +	
+    geom_line() +
+    ggtitle("Life Expectancies at Birth") +
+    scale_x_continuous(breaks=pretty_breaks(n=10)) +
+    ylab("Life Expectancy")
+
+
