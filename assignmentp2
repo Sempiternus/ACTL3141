@@ -441,9 +441,238 @@ colnames(EXN) <- c("Decile", "Male", "Female")
 
 d <- melt(EXN, "Decile")
 
-#Create a graph that shows the change in life expectancy when compared across different deciles and gender. 
+#Create a graph that shows the change in life expectancy when compared across different deciles and gender.
 ggplot(d, aes(x=Decile, y=value, color=variable)) +	
     geom_line() +
+    ggtitle("Life Expectancies at Birth") +
+    scale_x_continuous(breaks=pretty_breaks(n=10)) +
+    ylab("Life Expectancy")
+
+##Creating a graph to compare 1st and 10th IMD deciles of life expectancy over time##
+test <- filter(data, IMD.Decile == 1 & sex  == "male")
+test2 <- filter(data, IMD.Decile == 10 & sex  == "male")
+
+a=NULL
+for (i in 2001:2018)
+{
+    for (k in 0:90)
+    {
+        x <- mean(test$deaths[test$Registration.year == i & test$age == k])
+        a[i] = rbind(a[i], data.frame(x))
+    }
+}
+a <- do.call(rbind.data.frame, a)
+colnames(a) <- c(0:90)
+
+b=NULL
+for (i in 2001:2018)
+{
+    for (k in 0:90)
+    {
+        x <- mean(test$population[test$Registration.year == i & test$age == k])
+        b[i] = rbind(b[i], data.frame(x))
+    }
+}
+b <- do.call(rbind.data.frame, b)
+colnames(a) <- c(0:90)
+
+c=NULL
+for (i in 2001:2018)
+{
+    for (k in 0:90)
+    {
+        x <- mean(test2$deaths[test2$Registration.year == i & test2$age == k])
+        c[i] = rbind(c[i], data.frame(x))
+    }
+}
+c <- do.call(rbind.data.frame, c)
+colnames(c) <- c(0:90)
+
+d=NULL
+for (i in 2001:2018)
+{
+    for (k in 0:90)
+    {
+        x <- mean(test2$population[test2$Registration.year == i & test2$age == k])
+        d[i] = rbind(d[i], data.frame(x))
+    }
+}
+d <- do.call(rbind.data.frame, d)
+colnames(d) <- c(0:90)
+
+mqx2 <- cbind(a/b)
+mqx2 <- t(mqx2)
+mqx2 <- as.data.frame(mqx2)
+mEXN2 <- data.frame('2001' = numeric(), '2002' = numeric(), '2003' = numeric(), '2004' = numeric(), '2005' = numeric(), '2006' = numeric(), '2007' = numeric(), '2008' = numeric(), '2009' = numeric(), '2010' = numeric(), '2011' = numeric(), '2012' = numeric(), '2013' = numeric(), '2014' = numeric(), '2015' = numeric(), '2016' = numeric(), '2017' = numeric(), '2018' = numeric())
+mEXN2[nrow(mEXN2)+1, ] <- c(exn(probs2lifetable(mqx2$V1, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete"), 
+(exn(probs2lifetable(mqx2$V2, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V3, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V4, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V5, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V6, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V7, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V8, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V9, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V10, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V11, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V12, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V13, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V14, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V15, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V16, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V17, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx2$V18, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")))
+mEXN2 <- t(mEXN2)
+
+mqx3 <- cbind(c/d)
+mqx3 <- t(mqx3)
+mqx3 <- as.data.frame(mqx3)
+mEXN3 <- data.frame('2001' = numeric(), '2002' = numeric(), '2003' = numeric(), '2004' = numeric(), '2005' = numeric(), '2006' = numeric(), '2007' = numeric(), '2008' = numeric(), '2009' = numeric(), '2010' = numeric(), '2011' = numeric(), '2012' = numeric(), '2013' = numeric(), '2014' = numeric(), '2015' = numeric(), '2016' = numeric(), '2017' = numeric(), '2018' = numeric())
+mEXN3[nrow(mEXN3)+1, ] <- c(exn(probs2lifetable(mqx3$V1, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete"), 
+(exn(probs2lifetable(mqx3$V2, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V3, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V4, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V5, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V6, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V7, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V8, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V9, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V10, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V11, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V12, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V13, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V14, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V15, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V16, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V17, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx3$V18, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")))
+mEXN3 <- t(mEXN3)
+
+years <- as.data.frame(c(2001:2018))
+EXN2 <- cbind(years, mEXN2, mEXN3)
+colnames(EXN2) <- c("Year", "Male IMD 1", "Male IMD10")
+
+z <- melt(EXN2, "Year")
+	
+ggplot(z, aes(x=Year, y=value, color=variable)) +	
+    geom_line() +
+    ggtitle("Life Expectancies at Birth: Male") +
+    scale_x_continuous(breaks=pretty_breaks(n=10)) +
+    ylab("Life Expectancy")
+
+test3 <- filter(data, IMD.Decile == 1 & sex  == "female")
+test4 <- filter(data, IMD.Decile == 10 & sex  == "female")
+
+e=NULL
+for (i in 2001:2018)
+{
+    for (k in 0:90)
+    {
+        x <- mean(test3$deaths[test3$Registration.year == i & test3$age == k])
+        e[i] = rbind(e[i], data.frame(x))
+    }
+}
+e <- do.call(rbind.data.frame, e)
+colnames(e) <- c(0:90)
+
+f=NULL
+for (i in 2001:2018)
+{
+    for (k in 0:90)
+    {
+        x <- mean(test3$population[test3$Registration.year == i & test3$age == k])
+        f[i] = rbind(f[i], data.frame(x))
+    }
+}
+f <- do.call(rbind.data.frame, f)
+colnames(f) <- c(0:90)
+
+g=NULL
+for (i in 2001:2018)
+{
+    for (k in 0:90)
+    {
+        x <- mean(test4$deaths[test4$Registration.year == i & test4$age == k])
+        g[i] = rbind(g[i], data.frame(x))
+    }
+}
+g <- do.call(rbind.data.frame, g)
+colnames(g) <- c(0:90)
+
+h=NULL
+for (i in 2001:2018)
+{
+    for (k in 0:90)
+    {
+        x <- mean(test4$population[test4$Registration.year == i & test4$age == k])
+        h[i] = rbind(h[i], data.frame(x))
+    }
+}
+h <- do.call(rbind.data.frame, h)
+colnames(h) <- c(0:90)
+
+fqx2 <- cbind(e/f)
+fqx2 <- t(fqx2)
+fqx2 <- as.data.frame(fqx2)
+fEXN2 <- data.frame('2001' = numeric(), '2002' = numeric(), '2003' = numeric(), '2004' = numeric(), '2005' = numeric(), '2006' = numeric(), '2007' = numeric(), '2008' = numeric(), '2009' = numeric(), '2010' = numeric(), '2011' = numeric(), '2012' = numeric(), '2013' = numeric(), '2014' = numeric(), '2015' = numeric(), '2016' = numeric(), '2017' = numeric(), '2018' = numeric())
+fEXN2[nrow(fEXN2)+1, ] <- c(exn(probs2lifetable(fqx2$V1, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete"), 
+(exn(probs2lifetable(fqx2$V2, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V3, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V4, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V5, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V6, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V7, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V8, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V9, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V10, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V11, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V12, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V13, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V14, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V15, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V16, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V17, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx2$V18, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")))
+fEXN2 <- t(fEXN2)
+
+fqx3 <- cbind(g/h)
+fqx3 <- t(fqx3)
+fqx3 <- as.data.frame(fqx3)
+fEXN3 <- data.frame('2001' = numeric(), '2002' = numeric(), '2003' = numeric(), '2004' = numeric(), '2005' = numeric(), '2006' = numeric(), '2007' = numeric(), '2008' = numeric(), '2009' = numeric(), '2010' = numeric(), '2011' = numeric(), '2012' = numeric(), '2013' = numeric(), '2014' = numeric(), '2015' = numeric(), '2016' = numeric(), '2017' = numeric(), '2018' = numeric())
+fEXN3[nrow(fEXN3)+1, ] <- c(exn(probs2lifetable(fqx3$V1, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete"), 
+(exn(probs2lifetable(fqx3$V2, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V3, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V4, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V5, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V6, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V7, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V8, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V9, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V10, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V11, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V12, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V13, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V14, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V15, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V16, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V17, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(fqx3$V18, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")))
+fEXN3 <- t(fEXN3)
+
+EXN3 <- cbind(years, fEXN2, fEXN3)
+colnames(EXN3) <- c("Year", "Female IMD 1", "Female IMD10")
+
+y <- melt(EXN3, "Year")	
+	
+ggplot(y, aes(x=Year, y=value, color=variable)) +	
+    geom_line() +
+    ggtitle("Life Expectancies at Birth: Female") +
+    scale_x_continuous(breaks=pretty_breaks(n=10)) +
+    ylab("Life Expectancy")
+
+ggplot() + 
+    geom_line(data=y, aes(x=Year, y=value, color=variable)) + 
+    geom_line(data=z, aes(x=Year, y=value, color=variable)) +
     ggtitle("Life Expectancies at Birth") +
     scale_x_continuous(breaks=pretty_breaks(n=10)) +
     ylab("Life Expectancy")
