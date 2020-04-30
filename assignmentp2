@@ -423,15 +423,15 @@ fEXN <- t(fEXN)
 #Repeat
 mEXN <- data.frame(IMD1 = numeric(), IMD2 = numeric(), IMD3 = numeric(), IMD4 = numeric(), IMD5 = numeric(), IMD6 = numeric(), IMD7 = numeric(), IMD8 = numeric(), IMD9 = numeric(), IMD10 = numeric())
 mEXN[nrow(mEXN)+1, ] <- c(exn(probs2lifetable(mqx$V1, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete"), 
-(exn(probs2lifetable(mqx$V2, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
-(exn(probs2lifetable(mqx$V3, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
-(exn(probs2lifetable(mqx$V4, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
-(exn(probs2lifetable(mqx$V5, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
-(exn(probs2lifetable(mqx$V6, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
-(exn(probs2lifetable(mqx$V7, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
-(exn(probs2lifetable(mqx$V8, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
-(exn(probs2lifetable(mqx$V9, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")), 
-(exn(probs2lifetable(mqx$V10, type = "qx", radix = 100000, name = "Female LT"), x = 0, type = "complete")))
+(exn(probs2lifetable(mqx$V2, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V3, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V4, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V5, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V6, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V7, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V8, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V9, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")), 
+(exn(probs2lifetable(mqx$V10, type = "qx", radix = 100000, name = "Male LT"), x = 0, type = "complete")))
 mEXN <- t(mEXN)
 
 #Construct a vector of deciles to merge with our life expectancy dataframes. 
@@ -448,4 +448,153 @@ ggplot(d, aes(x=Decile, y=value, color=variable)) +
     scale_x_continuous(breaks=pretty_breaks(n=10)) +
     ylab("Life Expectancy")
 
+####################################TASK 2###############################################################################
+#Load relevant packages
+
+library("demography")
+library("splines")
+
+Ext <- read.csv("mID4PopEngland.csv") #Read relevant excel data. This information is filtered via excel rather than R. 
+Ext <- as.data.frame(Ext$X2018)
+rownames(Ext) <- c(0:90)
+Dxt <- read.csv("mID4DeathsEngland.csv")
+Dxt <- as.data.frame(Dxt$X2018)
+rownames(Dxt) <- c(0:90)
+mxt <- Dxt/Ext
+Ex <- rowSums(Ext)
+Dx <- rowSums (Dxt)
+mx <- Dx/Ex 
+x <- 40:89
+mx <- mx[as.character(x)]
+Ex <- Ex[as.character(x)]
+Dx <- Dx[as.character(x)]
+
+gompertz <- nls(mx ~ exp(b0 + b1*x), start = list(b0 = 1, b1 = 0), weights = Ex/mx) #Define Gompertz function
+mx_gompertz <- fitted(gompertz)
+plot(x, log(mx), pch = 20, xlab = "age", ylab =
+"Central mortality rate (log scale)",
+ main = "Australian Men: Gompertz law",ylim
+= range(-11, 0))
+lines(x, log(mx_gompertz), col ='blue')
+
+makeham <- nls(mx ~ A + exp(b0 + b1*x), start #Define Makeham function
+= list(A = 0, b0 = coef(gompertz)[1], b1 = coef
+(gompertz)[2]), weights = Ex/mx)
+makeham
+
+mx_makeham <- fitted(makeham) 
+plot(x, log(mx), pch = 20, xlab = "age", ylab =
+"Central mortality rate (log scale)",
+ main = "Australian Men: Makeham law",
+ylim = range(-11, 0))
+lines(x,log(mx_makeham), col = 'blue')
+
+cubic_basis <- ns(x, df=7) #Set nodes
+cubSpline <- lm(mx ~ cubic_basis, weights = Ex / mx )#Define Cubic Spline function
+mx_cubSpline <- fitted(cubSpline)
+plot(x, log(mx), pch = 20, xlab = "age", ylab
+ = "Central mortality rate (log scale)",
+ main = "Australian Men: Natural cubic spline", 
+ylim = range(-11,0))
+lines(x, log(mx_cubSpline), col = 'blue')
+
+
+smSpline <- smooth.spline(x, mx, spar = 0.5) #Define Smooth Spline function
+mx_smSpline <- fitted(smSpline)
+plot(x, log(mx), pch = 20, xlab = "age", ylab
+     = "Central mortality rate (log scale)",
+     main = "Australian Men: Smoothing spline",
+     ylim = range(-11, 0))
+lines(x, log(mx_smSpline), col = 'blue')
+
+#Plot all four graduation methods against each other
+plot(x, log(mx), pch = 20, xlab = "age", 
+ylab = "Central mortality rate (log scale)", 
+main = "Australian Men", 
+ylim = range(-11,0))
+lines(x, log(mx_gompertz), col = 2)
+lines(x, log(mx_makeham), col = 3)
+lines(x, log(mx_cubSpline), col = 4)
+lines(x, log(mx_smSpline), col = 5)
+legend("topleft", legend = c("Gompertz", "Makeham", "Natural Cubic Spline", "Smoothing Spline"), 
+col = 2:5, lty = 1)
+
+zx_makeham <- (Dx - Ex * mx_makeham) / sqrt(Ex * mx_makeham)
+zx_gompertz <- (Dx - Ex * mx_gompertz) / sqrt(Ex * mx_gompertz)
+zx_cubSpline <- (Dx - Ex * mx_cubSpline) / sqrt(Ex * mx_cubSpline)
+zx_smSpline <- (Dx - Ex * mx_smSpline) / sqrt(Ex * mx_smSpline)
+
+##Chi Squared Test
+
+chi2Test <- function(O, E, npar, alpha = 0.05){
+    chi2 <- sum((O - E)^2 / E) #Test statistic
+    df <- length(O) - npar
+    chi2_alpha <- qchisq(1 - alpha, df) #Critical value
+    p.value <- 1 - pchisq(chi2, df) #p.value
+    list(statistic = chi2, c.value = chi2_alpha, df = df, p.value = p.value)
+}
+
+chi2Test(Dx, Ex * mx_gompertz, 2)
+chi2Test(Dx, Ex * mx_makeham, 3)
+chi2Test(Dx, Ex * mx_cubSpline, cubSpline$df)
+chi2Test(Dx, Ex * mx_smSpline, smSpline$df)
+
+##Standardised Deviations 
+stdTest <- function(zx, breaks = c(-Inf, -1, 0, 1, Inf)){
+ observed <- table(cut(zx, breaks)) #count observation in each interval
+ expected.p <- diff(pnorm(breaks)) #expected probabilities for standard normal
+ chisq.test(observed, p = expected.p) #apply chisquare test
+}
+
+stdTest(zx_gompertz)
+stdTest(zx_makeham)
+stdTest(zx_cubSpline)
+stdTest(zx_smSpline)
+
+##Signs Test
+nages <- length(x)
+signTest_gompertz <- binom.test(sum(zx_gompertz > 0), nages)
+signTest_makeham <- binom.test(sum(zx_makeham > 0), nages)
+signTest_cubSpline <- binom.test(sum(zx_cubSpline > 0), nages)
+signTest_smSpline <- binom.test(sum(zx_smSpline > 0), nages)
+
+signTest_gompertz
+signTest_makeham
+signTest_cubSpline
+signTest_smSpline
+
+##Cumulative Deviations
+cumDevTest <- function(A, E, alpha = 0.05){
+ cumDev <- sum(A - E) / sqrt(sum(E)) #Test statistic
+ z_alpha <- qnorm(1 - alpha/2) #Critical value
+ p.value <- 2 *(1 - pnorm(abs(cumDev))) #p.value (Note it is two-tailed)
+ list(statistic = cumDev, c.value = z_alpha, p.value = p.value)
+}
+
+cumDevTest(Dx, Ex * mx_gompertz)
+cumDevTest(Dx, Ex * mx_makeham)
+cumDevTest(Dx, Ex * mx_cubSpline)
+cumDevTest(Dx, Ex * mx_smSpline)
+
+##Grouping of Signs
+groupSignTest <- function(zx, alpha = 0.05){
+ #Count +'s and -'s
+ signs <- sign(zx)
+ n1 <- sum(signs == 1)
+ n2 <- sum(signs == -1)
+ #Count runs
+ y <- c(-1, sign(zx))
+ G <- sum((y[-1] != y[-(n1 + n2 + 1)]) & y[-1]!= -1) # No Runs
+ #Normal approximation
+ mu <- n1 * (n2 + 1) / (n1 + n2)
+ s2 <- (n1 * n2)^2 / (n1 + n2)^3
+ G_alpha <- qnorm(alpha, mean = mu, sd = sqrt(s2)) #Critical value
+ p.value <- (pnorm(G + 0.5, mean = mu, sd = sqrt(s2))) #p.value (one sided)
+ list(statistic = G, c.value = G_alpha, p.value = p.value)
+}
+
+groupSignTest(zx_gompertz)
+groupSignTest(zx_makeham)
+groupSignTest(zx_cubSpline)
+groupSignTest(zx_smSpline)
 
